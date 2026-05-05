@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Universal Wine & Liquor – Mobile Spin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* HIDE COMPLETELY ON DESKTOP */
+        @media (min-width: 600px) {
+            html, body { display: none !important; }
+        }
+
+        #shell {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .panel-left {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2;
+            background: transparent;
+            padding: 6vh 20px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .panel-right {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .panel-right img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            object-position: bottom center;
+            display: block;
+        }
+
+        /* MOBILE TYPOGRAPHY & SIZING */
+        .brand-name { font-family: 'Bebas Neue', sans-serif; color: #111; line-height: 1; text-align: center; font-size: clamp(30px, 9vw, 48px); }
+        .brand-sub { color: #aaa; text-transform: uppercase; text-align: center; font-size: clamp(8px, 2.2vw, 11px); letter-spacing: 3px; margin-top: 4px; margin-bottom: 8px; }
+        .topline { color: #888; text-transform: uppercase; text-align: center; font-size: clamp(6px, 1.8vw, 8px); letter-spacing: 1.5px; margin-bottom: 1px; }
+        .headline { font-family: 'Bebas Neue', sans-serif; color: #111; line-height: 1; text-align: center; font-size: clamp(20px, 6vw, 32px); margin-bottom: 8px; }
+        
+        .wheel-box { position: relative; flex-shrink: 0; width: min(200px, 52vw); height: min(200px, 52vw); margin: 0 auto; }
+        #wheelCanvas { width: 100%; height: 100%; cursor: pointer; display: block; }
+        .needle { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 20; pointer-events: none; }
+        
+        .spin-hint { color: #ccc; text-transform: uppercase; text-align: center; font-size: clamp(6px, 1.6vw, 8px); letter-spacing: 2px; margin-top: 4px; }
+        .w-unlocked { color: #555; text-transform: uppercase; font-weight: 700; text-align: center; font-size: clamp(8px, 2.2vw, 11px); letter-spacing: 2px; margin-bottom: 6px; }
+        .w-big-amt { font-family: 'Bebas Neue', sans-serif; color: #111; line-height: 1; text-align: center; font-size: clamp(50px, 13vw, 70px); letter-spacing: 2px; margin-bottom: 2px; }
+        .w-big-off { color: #777; font-size: clamp(28px, 8vw, 40px); }
+        .w-sub { color: #888; line-height: 1.5; text-align: center; font-size: clamp(8px, 2.2vw, 10px); margin-bottom: 10px; }
+        
+        .btn-claim {
+            width: 100%; background: #111; color: #fff; font-family: 'Bebas Neue', sans-serif;
+            border: none; cursor: pointer; text-decoration: none; display: block; text-align: center;
+            font-size: clamp(13px, 3.5vw, 17px); padding: 10px; letter-spacing: 3px;
+        }
+        .btn-claim:hover { background: #333; }
+        .legal { color: #ccc; line-height: 1.5; text-align: center; width: 100%; font-size: clamp(6px, 1.6vw, 8px); margin-top: 8px; }
+
+        @keyframes popBounce {
+            0% { transform: scale(0.4); opacity: 0; }
+            65% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop { animation: popBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+    </style>
+</head>
+<body>
+
+<div id="shell">
+  <div class="panel-right">
+    <img src="App_Universal_wine_original.png" alt="Universal Wine & Liquor">
+  </div>
+
+  <div class="panel-left">
+    <div id="screen-spin" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+      <div class="brand-name">UNIVERSAL</div>
+      <div class="brand-sub">Wine &amp; Liquor</div>
+      <div class="topline">Win up to $10 off your order</div>
+      <div class="headline">SPIN TO WIN</div>
+      <div class="wheel-box">
+        <div class="needle">
+          <svg width="20" height="26" viewBox="0 0 28 34"><polygon points="14,32 26,6 14,12 2,6" fill="#f0c040" stroke="#c8a84b" stroke-width="1"/></svg>
+        </div>
+        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+      </div>
+      <p class="spin-hint">↓ Tap the wheel to spin</p>
+    </div>
+
+    <div id="screen-winner" style="display:none;flex-direction:column;align-items:center;width:100%;">
+      <div class="brand-name">UNIVERSAL</div>
+      <div class="brand-sub">Wine &amp; Liquor</div>
+      <div class="w-unlocked pop" id="unlockedLabel">You've Unlocked</div>
+      <div class="w-big-amt">$10 <span class="w-big-off">OFF</span></div>
+      <p class="w-sub">10% off up to $10 &middot; First-time customers<br>Online only &middot; One time use.<br><br>Click below to claim your code.</p>
+      <a class="btn-claim" href="https://universalwineandliquorct.com/pages/spin-promo" target="_blank">CLAIM MY DISCOUNT &rarr;</a>
+      <p class="legal">Online only. Excludes sale items. First-time customers only.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* WHEEL LOGIC (Identical to Desktop) */
+const SEGS = [{v:'$5',sub:'OFF',gold:false},{v:'$2',sub:'OFF',gold:true},{v:'$3',sub:'OFF',gold:false},{v:'$7',sub:'OFF',gold:true},{v:'$2',sub:'OFF',gold:false},{v:'$10',sub:'OFF',gold:true},{v:'$5',sub:'OFF',gold:false},{v:'$7',sub:'OFF',gold:true},{v:'$3',sub:'OFF',gold:false},{v:'$2',sub:'OFF',gold:true}];
+const WIN_IDX = 5; const C = document.getElementById('wheelCanvas'); const ctx = C.getContext('2d');
+const W = C.width, CX = W/2, CY = W/2, R = W/2 - 20, N = SEGS.length, SA = (2*Math.PI)/N;
+let rotation = 0, spinning = false;
+
+function drawWheel(rot) {
+    ctx.clearRect(0,0,W,W);
+    const rim = ctx.createRadialGradient(CX,CY,R-2,CX,CY,R+22);
+    rim.addColorStop(0,'#F8D860'); rim.addColorStop(0.5,'#C8A84B'); rim.addColorStop(1,'#7a5c10');
+    ctx.beginPath(); ctx.arc(CX,CY,R+20,0,2*Math.PI); ctx.fillStyle=rim; ctx.fill();
+    for(let i=0;i<N;i++){
+        const a1=rot+i*SA-Math.PI/2, a2=a1+SA;
+        ctx.beginPath(); ctx.moveTo(CX,CY); ctx.arc(CX,CY,R,a1,a2); ctx.closePath();
+        ctx.fillStyle=SEGS[i].gold?'#F0C040':'#E4E4E4'; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.stroke();
+    }
+    for(let i=0;i<N;i++){
+        const mid=rot+i*SA-Math.PI/2+SA/2; const tx=CX+Math.cos(mid)*R*0.67, ty=CY+Math.sin(mid)*R*0.67;
+        ctx.save(); ctx.translate(tx,ty); ctx.rotate(mid+Math.PI/2); const is10=SEGS[i].v==='$10';
+        ctx.fillStyle=SEGS[i].gold?'#5a3e00':'#333'; ctx.font='bold '+(is10?52:40)+'px Montserrat,sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(SEGS[i].v,0,is10?-14:-10);
+        ctx.font='bold '+(is10?26:22)+'px Montserrat,sans-serif'; ctx.fillStyle=SEGS[i].gold?'#7a5500':'#555';
+        ctx.fillText(SEGS[i].sub,0,is10?28:22); ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(CX,CY,90,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#ddd'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(CX,CY,74,0,2*Math.PI); ctx.fillStyle='#111'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.font='bold 52px Montserrat,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('SPIN',CX,CY);
+}
+drawWheel(0); C.addEventListener('click', () => spinWheel());
+
+function spinWheel() {
+    if(spinning) return; spinning=true;
+    const targetCenter=-(WIN_IDX*SA+SA/2), nudge=(Math.random()-0.5)*SA*0.4, spins=2*Math.PI*(13+Math.floor(Math.random()*4)), target=targetCenter+nudge-spins, startRot=rotation, dur=6000, t0=performance.now();
+    function ease(t){ return 1-Math.pow(1-t,4); }
+    (function animate(now){
+        const t=Math.min((now-t0)/dur,1); rotation=startRot+(target-startRot)*ease(t); drawWheel(rotation);
+        if(t<1){ requestAnimationFrame(animate); } else { rotation=target; drawWheel(rotation); spinning=false; setTimeout(showWinner,750); }
+    })(performance.now());
+}
+function showWinner() {
+    document.getElementById('screen-spin').style.display='none'; const w=document.getElementById('screen-winner'); w.style.display='flex';
+    const lbl=document.getElementById('unlockedLabel'); lbl.classList.remove('pop'); void lbl.offsetWidth; lbl.classList.add('pop');
+}
+</script>
+</body>
+</html>
