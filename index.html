@@ -119,6 +119,7 @@
             width: 248px;
             height: 248px;
             flex-shrink: 0;
+            margin: 0 auto; /* Forces strict horizontal centering */
         }
         #wheelCanvas {
             width: 100%;
@@ -205,27 +206,39 @@
 
         /* ══════════════════════════════════════════════════════
            MOBILE OVERRIDE
-           Full screen background image with overlaying wheel.
+           Forces absolute full screen, hides all backgrounds.
         ══════════════════════════════════════════════════════ */
+        
+        /* 1. Force the shell to completely cover the mobile screen */
+        html.mobile,
         html.mobile body,
         html.mobile #shell {
-            overflow: hidden;
-            height: 100vh;
-            height: 100dvh;
-            align-items: stretch;
-        }
-
-        html.mobile #canvas {
-            position: relative; /* Crucial for overlapping layers */
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
             height: 100dvh !important;
-            transform: none !important;
-            overflow: hidden;
-            display: block;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            z-index: 999999 !important; /* Pushes it above your website UI */
+            background: #fff !important; 
         }
 
-        /* Left panel (Wheel & Text) acts as a transparent overlay layer */
+        /* 2. Anchor the inner canvas tightly inside the shell */
+        html.mobile #canvas {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            transform: none !important;
+            overflow: hidden !important;
+            display: block !important;
+        }
+
+        /* 3. Left panel (Wheel & Text) as a perfectly centered transparent overlay */
         html.mobile .panel-left {
             position: absolute;
             top: 0;
@@ -233,16 +246,17 @@
             width: 100%;
             height: 100%;
             z-index: 2;
-            background: transparent; /* Lets background image show through */
-            padding: 6vh 20px 20px; /* Pushes content down slightly from the very top */
+            background: transparent; 
+            padding: 6vh 20px 20px; /* Adjust '6vh' if you need it slightly higher or lower */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Aligns content to center top */
-            align-items: center;
+            justify-content: flex-start; 
+            align-items: center; /* STRICT center alignment */
+            text-align: center;
             overflow: hidden;
         }
 
-        /* Right panel (Image) acts as the fullscreen background layer */
+        /* 4. Right panel acts as the background layer */
         html.mobile .panel-right {
             position: absolute;
             top: 0;
@@ -254,20 +268,22 @@
             display: block;
         }
 
-        /* Image Toggling for Mobile */
+        /* 5. Image Toggling & Fitting */
         html.mobile .img-desktop { display: none !important; }
         html.mobile .img-mobile {
             display: block;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures it perfectly covers the whole screen */
-            object-position: bottom left; /* Pins your logo to the bottom left */
+            /* contain ensures the WHOLE image fits without zooming in or cutting off */
+            object-fit: contain; 
+            object-position: bottom center; 
         }
 
         /* Wheel size on mobile */
         html.mobile .wheel-box {
             width: min(200px, 52vw);
             height: min(200px, 52vw);
+            margin: 0 auto; /* Extra safety for horizontal centering */
         }
 
         /* Mobile typography */
@@ -342,9 +358,7 @@ function applyLayout() {
 
     if (vw < MOBILE_BP) {
         document.documentElement.classList.add('mobile');
-        canvasEl.style.transform = 'none';
-        canvasEl.style.width  = '100vw';
-        canvasEl.style.height = vh + 'px'; 
+        // Mobile overrides are handled entirely via CSS now
     } else {
         document.documentElement.classList.remove('mobile');
         canvasEl.style.width  = '';
