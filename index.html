@@ -14,14 +14,15 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevents any scrolling inside the iframe */
-            background: transparent;
+            overflow: hidden; 
+            background: #fff;
             font-family: 'Montserrat', sans-serif;
+            position: fixed; /* Prevents "pull-to-refresh" and bounce on mobile */
         }
 
         #shell {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -30,7 +31,7 @@
         }
 
         /* ══════════════════════════════════════════════════════
-           DESKTOP LAYOUT (50/50 Split)
+           DESKTOP LAYOUT
         ══════════════════════════════════════════════════════ */
         #canvas {
             width: 800px;
@@ -41,6 +42,7 @@
             transform-origin: center center;
             background: #fff;
             overflow: hidden;
+            position: relative;
         }
 
         .panel-left {
@@ -53,6 +55,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px 20px;
+            z-index: 10;
         }
 
         .panel-right {
@@ -69,13 +72,12 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            object-position: center;
             display: block;
         }
 
         .img-mobile { display: none; }
 
-        /* ── DESKTOP TYPOGRAPHY ── */
+        /* TYPOGRAPHY */
         .brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 6px; color: #111; line-height: 1; text-align: center; }
         .brand-sub { font-size: 11px; letter-spacing: 5px; color: #aaa; text-transform: uppercase; margin-top: 4px; margin-bottom: 16px; text-align: center; }
         .topline { font-size: 8px; color: #888; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 2px; text-align: center; }
@@ -91,9 +93,7 @@
         .w-big-off { font-size: 38px; color: #777; }
         .w-sub { font-size: 9px; color: #888; line-height: 1.7; margin-bottom: 16px; text-align: center; }
         
-        .btn-claim { width: 100%; padding: 12px 10px; background: #111; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border: none; cursor: pointer; text-decoration: none; display: block; text-align: center; transition: background 0.2s, transform 0.1s; }
-        .btn-claim:hover { background: #333; }
-        .btn-claim:active { transform: scale(0.98); }
+        .btn-claim { width: 100%; padding: 12px 10px; background: #111; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border: none; cursor: pointer; text-decoration: none; display: block; text-align: center; }
         .legal { margin-top: 14px; font-size: 6.5px; color: #ccc; line-height: 1.5; text-align: center; width: 100%; }
 
         @keyframes popBounce { 0% { transform: scale(0.4); opacity: 0; } 65% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
@@ -101,63 +101,50 @@
 
 
         /* ══════════════════════════════════════════════════════
-           MOBILE OVERRIDE (For Floating Popup Box)
+           MOBILE FIXES
         ══════════════════════════════════════════════════════ */
         
+        html.mobile body { overflow: hidden; position: relative; }
+
         html.mobile #canvas {
-            width: 100% !important;
-            height: 100% !important;
-            position: relative !important;
-            transform: none !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
             display: block !important;
-            background: #fff;
         }
 
-        /* Full container background image anchored to bottom */
+        /* Background image container */
         html.mobile .panel-right {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
-            display: block;
         }
 
         html.mobile .img-desktop { display: none !important; }
         html.mobile .img-mobile {
             display: block;
             width: 100%; height: 100%;
-            object-fit: contain; /* Ensures the whole bottle is visible */
-            object-position: bottom center; /* Keeps it at the bottom */
+            object-fit: cover; /* CHANGED: cover ensures no white spaces on sides */
+            object-position: center;
         }
 
-        /* Transparent overlay for wheel centered at the top */
+        /* Content Overlay */
         html.mobile .panel-left {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 2;
-            background: transparent; 
-            padding: 15px 10px; /* Reduced padding to keep it high up */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; /* Locks content to the top */
-            align-items: center; 
-            text-align: center;
+            background: rgba(255, 255, 255, 0.85); /* Slight overlay to make text readable over image */
+            padding: 20px;
+            justify-content: center; /* Centers wheel vertically */
         }
 
-        /* Scaled-down elements for mobile popup box */
-        html.mobile .wheel-box { width: 160px; height: 160px; margin: 0 auto; }
-        html.mobile .brand-name  { font-size: 26px; }
-        html.mobile .headline    { font-size: 20px; margin-bottom: 6px; }
-        html.mobile .brand-sub   { font-size: 8px; letter-spacing: 3px; margin-bottom: 6px; margin-top: 2px; }
-        html.mobile .topline     { font-size: 7px; margin-bottom: 1px; }
-        html.mobile .spin-hint   { font-size: 7px; margin-top: 4px; }
-        html.mobile .w-big-amt   { font-size: 44px; }
-        html.mobile .w-big-off   { font-size: 24px; }
-        html.mobile .w-unlocked  { font-size: 9px; margin-bottom: 4px; }
-        html.mobile .w-sub       { font-size: 8px; line-height: 1.4; margin-bottom: 8px; }
-        html.mobile .btn-claim   { font-size: 14px; padding: 10px; }
-        html.mobile .legal       { font-size: 6px; margin-top: 6px; }
+        html.mobile .wheel-box { width: 220px; height: 220px; } /* Slightly larger for visibility */
+        html.mobile .brand-name  { font-size: 34px; }
+        html.mobile .headline    { font-size: 24px; }
+        html.mobile .w-big-amt   { font-size: 50px; }
     </style>
 </head>
 <body>
@@ -185,9 +172,9 @@
         <div class="brand-sub">Wine &amp; Liquor</div>
         <div class="w-unlocked pop" id="unlockedLabel">You've Unlocked</div>
         <div class="w-big-amt">$10 <span class="w-big-off">OFF</span></div>
-        <p class="w-sub">10% off up to $10 &middot; First-time customers<br>Online only &middot; One time use.<br><br>Click below to claim your code.</p>
+        <p class="w-sub">10% off up to $10 &middot; First-time customers<br>Online only &middot; One time use.</p>
         <a class="btn-claim" href="https://universalwineandliquorct.com/pages/spin-promo" target="_blank">CLAIM MY DISCOUNT &rarr;</a>
-        <p class="legal">Online only. Excludes sale items. First-time customers only.</p>
+        <p class="legal">Online only. Excludes sale items.</p>
       </div>
     </div>
 
@@ -200,36 +187,28 @@
 </div>
 
 <script>
-/* ─────────────────────────────────────────────────────────────
-   LAYOUT SHAPESHIFTER LOGIC
-───────────────────────────────────────────────────────────── */
 const DESIGN_W  = 800;
 const DESIGN_H  = 600;
 const MOBILE_BP = 600; 
 const canvasEl  = document.getElementById('canvas');
 
 function applyLayout() {
-    // Measure the iframe itself
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
     if (vw < MOBILE_BP) {
-        // TURN ON MOBILE MODE
         document.documentElement.classList.add('mobile');
         canvasEl.style.transform = 'none'; 
     } else {
-        // TURN ON DESKTOP MODE
         document.documentElement.classList.remove('mobile');
         const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H, 1);
         canvasEl.style.transform = `scale(${scale})`;
     }
 }
-applyLayout();
 window.addEventListener('resize', applyLayout);
+applyLayout();
 
-/* ─────────────────────────────────────────────────────────────
-   SPIN WHEEL LOGIC
-───────────────────────────────────────────────────────────── */
+/* SPIN WHEEL LOGIC (Keep as is) */
 const SEGS = [
   {v:'$5',  sub:'OFF', gold:false},
   {v:'$2',  sub:'OFF', gold:true },
@@ -242,9 +221,8 @@ const SEGS = [
   {v:'$3',  sub:'OFF', gold:false},
   {v:'$2',  sub:'OFF', gold:true },
 ];
-
 const WIN_IDX = 5;
-const C   = document.getElementById('wheelCanvas');
+const C = document.getElementById('wheelCanvas');
 const ctx = C.getContext('2d');
 const W = C.width, CX = W/2, CY = W/2, R = W/2 - 20;
 const N = SEGS.length, SA = (2*Math.PI)/N;
@@ -276,14 +254,12 @@ function drawWheel(rot) {
         ctx.fillText(SEGS[i].sub,0,is10?28:22);
         ctx.restore();
     }
-
     ctx.beginPath(); ctx.arc(CX,CY,90,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#ddd'; ctx.lineWidth=2; ctx.stroke();
     ctx.beginPath(); ctx.arc(CX,CY,74,0,2*Math.PI); ctx.fillStyle='#111'; ctx.fill();
     ctx.fillStyle='#fff'; ctx.font='bold 52px Montserrat,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('SPIN',CX,CY);
 }
-
 drawWheel(0);
-C.addEventListener('click', () => spinWheel());
+C.addEventListener('click', spinWheel);
 
 function spinWheel() {
     if(spinning) return;
