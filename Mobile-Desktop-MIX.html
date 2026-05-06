@@ -8,29 +8,29 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Base Setup (Transparent for Desktop Floating Effect) */
+        /* STRICT NO-SCROLL SETUP */
         html, body {
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents any scrolling inside the iframe */
             background: transparent;
             font-family: 'Montserrat', sans-serif;
         }
 
         #shell {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: transparent; /* Keeps website visible underneath */
-            z-index: 999999;
+            background: transparent;
+            overflow: hidden;
         }
 
         /* ══════════════════════════════════════════════════════
-           DESKTOP LAYOUT (50/50 Split Box)
+           DESKTOP LAYOUT (50/50 Split)
         ══════════════════════════════════════════════════════ */
         #canvas {
             width: 800px;
@@ -40,8 +40,6 @@
             align-items: stretch;
             transform-origin: center center;
             background: #fff;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5); /* Dropshadow for floating effect */
-            border-radius: 8px; /* Slightly rounded corners */
             overflow: hidden;
         }
 
@@ -75,7 +73,7 @@
             display: block;
         }
 
-        .img-mobile { display: none; } /* Hidden on desktop */
+        .img-mobile { display: none; }
 
         /* ── DESKTOP TYPOGRAPHY ── */
         .brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 6px; color: #111; line-height: 1; text-align: center; }
@@ -103,74 +101,63 @@
 
 
         /* ══════════════════════════════════════════════════════
-           MOBILE OVERRIDE (Triggered automatically by JS)
+           MOBILE OVERRIDE (For Floating Popup Box)
         ══════════════════════════════════════════════════════ */
         
-        /* 1. Paint background solid white so website is hidden */
-        html.mobile, html.mobile body, html.mobile #shell {
-            background: #fff !important; 
-        }
-
-        /* 2. Canvas expands to fill the entire screen */
         html.mobile #canvas {
-            position: absolute !important;
-            top: 0 !important; left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            height: 100dvh !important;
+            width: 100% !important;
+            height: 100% !important;
+            position: relative !important;
             transform: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
             display: block !important;
+            background: #fff;
         }
 
-        /* 3. Panel Left becomes transparent overlay centered at the top */
+        /* Full container background image anchored to bottom */
+        html.mobile .panel-right {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            display: block;
+        }
+
+        html.mobile .img-desktop { display: none !important; }
+        html.mobile .img-mobile {
+            display: block;
+            width: 100%; height: 100%;
+            object-fit: contain; /* Ensures the whole bottle is visible */
+            object-position: bottom center; /* Keeps it at the bottom */
+        }
+
+        /* Transparent overlay for wheel centered at the top */
         html.mobile .panel-left {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 2;
             background: transparent; 
-            padding: 6vh 20px 20px; 
+            padding: 15px 10px; /* Reduced padding to keep it high up */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Keeps it at the top */
-            align-items: center; /* Keeps it horizontally centered */
+            justify-content: flex-start; /* Locks content to the top */
+            align-items: center; 
             text-align: center;
         }
 
-        /* 4. Panel Right becomes the full-screen background layer */
-        html.mobile .panel-right {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            background: transparent;
-            display: block;
-        }
-
-        /* 5. Image Swap */
-        html.mobile .img-desktop { display: none !important; }
-        html.mobile .img-mobile {
-            display: block;
-            width: 100%; height: 100%;
-            object-fit: contain; 
-            object-position: bottom center; 
-        }
-
-        /* Mobile Typography & Sizing */
-        html.mobile .wheel-box { width: min(200px, 52vw); height: min(200px, 52vw); margin: 0 auto; }
-        html.mobile .brand-name  { font-size: clamp(30px, 9vw, 48px); }
-        html.mobile .headline    { font-size: clamp(20px, 6vw, 32px); margin-bottom: 8px; }
-        html.mobile .brand-sub   { font-size: clamp(8px, 2.2vw, 11px); letter-spacing: 3px; margin-bottom: 8px; }
-        html.mobile .topline     { font-size: clamp(6px, 1.8vw, 8px); margin-bottom: 1px; }
-        html.mobile .spin-hint   { font-size: clamp(6px, 1.6vw, 8px); margin-top: 4px; }
-        html.mobile .w-big-amt   { font-size: clamp(50px, 13vw, 70px); }
-        html.mobile .w-big-off   { font-size: clamp(28px, 8vw, 40px); }
-        html.mobile .w-unlocked  { font-size: clamp(8px, 2.2vw, 11px); }
-        html.mobile .w-sub       { font-size: clamp(8px, 2.2vw, 10px); line-height: 1.5; margin-bottom: 10px; }
-        html.mobile .btn-claim   { font-size: clamp(13px, 3.5vw, 17px); padding: 10px; }
-        html.mobile .legal       { font-size: clamp(6px, 1.6vw, 8px); margin-top: 8px; }
+        /* Scaled-down elements for mobile popup box */
+        html.mobile .wheel-box { width: 160px; height: 160px; margin: 0 auto; }
+        html.mobile .brand-name  { font-size: 26px; }
+        html.mobile .headline    { font-size: 20px; margin-bottom: 6px; }
+        html.mobile .brand-sub   { font-size: 8px; letter-spacing: 3px; margin-bottom: 6px; margin-top: 2px; }
+        html.mobile .topline     { font-size: 7px; margin-bottom: 1px; }
+        html.mobile .spin-hint   { font-size: 7px; margin-top: 4px; }
+        html.mobile .w-big-amt   { font-size: 44px; }
+        html.mobile .w-big-off   { font-size: 24px; }
+        html.mobile .w-unlocked  { font-size: 9px; margin-bottom: 4px; }
+        html.mobile .w-sub       { font-size: 8px; line-height: 1.4; margin-bottom: 8px; }
+        html.mobile .btn-claim   { font-size: 14px; padding: 10px; }
+        html.mobile .legal       { font-size: 6px; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -218,12 +205,13 @@
 ───────────────────────────────────────────────────────────── */
 const DESIGN_W  = 800;
 const DESIGN_H  = 600;
-const MOBILE_BP = 600; // Breakpoint for phones
+const MOBILE_BP = 600; 
 const canvasEl  = document.getElementById('canvas');
 
 function applyLayout() {
-    const vw = window.innerWidth  || document.documentElement.clientWidth;
-    const vh = window.innerHeight || document.documentElement.clientHeight;
+    // Measure the iframe itself
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
     if (vw < MOBILE_BP) {
         // TURN ON MOBILE MODE
