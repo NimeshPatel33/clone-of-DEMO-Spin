@@ -148,7 +148,15 @@
             z-index: 2;
             background: rgba(255, 255, 255, 0.85);
             padding: 20px;
-            justify-content: center;
+            justify-content: flex-start; /* push content toward top */
+            padding-top: 30px;
+        }
+ 
+        /* Shift all wheel content left by 25% from its centered position */
+        html.mobile #screen-spin,
+        html.mobile #screen-winner {
+            transform: translateX(-25%);
+            width: 100%;
         }
  
         html.mobile .wheel-box { width: 220px; height: 220px; }
